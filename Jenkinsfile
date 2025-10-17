@@ -2,54 +2,33 @@ pipeline {
     agent any
 
     parameters {
-        choice(name: 'ENVIRONMENT', choices: ['dev', 'stage', 'prod'], description: 'Select deployment environment')
-    }
-
-    environment {
-        APP_NAME = "my-app"
-        REPO_URL = "https://github.com/mosalman8785/jenkins.git"
-        BRANCH = "master"
+        string(name: 'DEPLOY_ENV', defaultValue: 'prod', description: 'Environment to deploy')
     }
 
     stages {
         stage('Checkout') {
             steps {
-                echo "Checking out code from ${env.REPO_URL} (branch ${env.BRANCH})"
-                git branch: "${env.BRANCH}", url: "${env.REPO_URL}"
+                git branch: 'master', url: 'https://github.com/mosalman8785/jenkins.git'
             }
         }
 
         stage('Build') {
             steps {
-                echo "Building ${env.APP_NAME}..."
-                // Example build command
-                // sh 'pip install -r requirements.txt'
+                echo "Building for master..."
             }
         }
 
         stage('Test') {
             steps {
-                echo "Running tests for ${env.APP_NAME}..."
-                // Example test command
-                // sh 'pytest'
+                echo "Running tests for master..."
             }
         }
 
         stage('Deploy') {
             steps {
-                echo "Deploying ${env.APP_NAME} to ${params.ENVIRONMENT} environment..."
-                // Example deploy command
-                // sh "kubectl apply -f deployment.yaml -n ${params.ENVIRONMENT}"
+                input message: "Approve deployment to PROD?"
+                echo "Deploying to ${params.DEPLOY_ENV}..."
             }
-        }
-    }
-
-    post {
-        success {
-            echo "Pipeline succeeded! 🎉"
-        }
-        failure {
-            echo "Pipeline failed! ❌"
         }
     }
 }
